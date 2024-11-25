@@ -70,15 +70,46 @@ def main():
     st.markdown("""
     This model simulates the daily interaction between plant pathogens, plant vigor, and biomass.
     
-    ### Key Components:
-    - **Plant Biomass (B)**: Physical size of the plant (0 = seedling, 1 = maximum)
-    - **Plant Vigor (V)**: Metabolic energy reserves (0 = depleted, 1 = maximum)
-    - **Pathogen Load (P)**: Pathogen population (0 = none, 1 = maximum)
+    ### Model Variables:
+    - **Plant Biomass (B)**: Physical size/mass of the plant
+        - B = 0: Initial seedling size
+        - B = 1: Maximum mature size
+        - Growth depends on available vigor and current size
     
-    ### Key Relationships:
-    - Biomass growth depends on both vigor and current size
-    - Vigor represents energy reserves that support growth and defense
-    - Pathogens primarily affect vigor, which then impacts growth
+    - **Plant Vigor (V)**: Root metabolic energy reserves
+        - V = 0: Completely depleted energy reserves
+        - V = 1: Maximum energy storage capacity
+        - Supports both growth and pathogen defense
+    
+    - **Pathogen Load (P)**: Root pathogen population
+        - P = 0: No pathogens present
+        - P = 1: Maximum pathogen carrying capacity
+        - Growth inhibited by plant defenses
+    
+    ### System Equations:
+    1. **Pathogen Dynamics** (dP/dt):
+        ```
+        dP/dt = (r0 * e^(-β*V) - δ) * P * (1-P)
+        ```
+        - Pathogen growth reduced by plant vigor through β
+        - Natural death rate δ
+        - Logistic growth limitation (1-P)
+    
+    2. **Vigor Dynamics** (dV/dt):
+        ```
+        dV/dt = η*(1-V) - γ*g*B - α*P*V
+        ```
+        - Natural recovery rate η
+        - Energy cost of growth γ*g*B
+        - Loss from pathogen damage α*P*V
+    
+    3. **Biomass Growth** (dB/dt):
+        ```
+        dB/dt = g * V * B * (1-B)
+        ```
+        - Base growth rate g
+        - Growth requires vigor V
+        - Logistic growth limitation (1-B)
     """)
 
     # Create three columns for parameters
@@ -92,7 +123,7 @@ def main():
                       help="How effectively vigor reduces pathogen reproduction")
         delta = st.slider("δ (death rate)", 0.0, 0.3, 0.1, 0.01,
                        help="Natural pathogen death rate")
-        P0 = st.slider("Initial Pathogen Load", 0.0, 0.2, 0.01, 0.01,
+        P0 = st.slider("Initial Pathogen Load", 0.0, 1.0, 0.2, 0.01,
                      help="Starting pathogen population")
 
     with col2:
@@ -103,7 +134,7 @@ def main():
                        help="How much growth depletes vigor")
         alpha = st.slider("α (pathogen impact)", 0.0, 0.3, 0.1, 0.01,
                        help="How much pathogens reduce vigor")
-        V0 = st.slider("Initial Vigor", 0.0, 1.0, 0.8, 0.05,
+        V0 = st.slider("Initial Vigor", 0.0, 1.0, 0.75, 0.05,
                      help="Starting vigor level")
 
     with col3:
@@ -112,7 +143,7 @@ def main():
                     help="Base growth rate")
         B0 = st.slider("Initial Biomass", 0.0, 0.2, 0.05, 0.01,
                      help="Starting plant size")
-        t_end = st.slider("Simulation Days", 30, 180, 120, 10,
+        t_end = st.slider("Simulation Days", 30, 180, 105, 15,
                        help="Length of simulation")
 
     # Run simulation with current parameters
@@ -133,26 +164,31 @@ def main():
     with col3:
         st.metric("Final Biomass", f"{B[-1]:.3f}")
 
-    # Add explanation of results
+    # Update the interpretation section
     st.markdown("""
     ### Interpreting the Results:
     - **Plant Biomass** (green line):
         - Physical size of the plant
-        - Growth depends on available vigor
-        - Shows actual plant development
+        - Growth rate proportional to vigor level
+        - Shows logistic growth pattern
+        - Typically reaches ~80% of maximum by day 60
     
     - **Plant Vigor** (blue line):
-        - Metabolic energy reserves
-        - Recovers naturally but consumed by growth
-        - Reduced by pathogen pressure
+        - Root metabolic energy reserves
+        - Naturally recovers but depleted by:
+            1. Supporting biomass growth
+            2. Defending against pathogens
+        - Key mediator between growth and defense
     
     - **Pathogen Load** (red line):
-        - Population of pathogens
-        - Growth limited by plant vigor
-        - Can cause plant stress by reducing vigor
+        - Population of root pathogens
+        - Growth suppressed by plant vigor
+        - Competes for plant resources
+        - Can cause plant stress by depleting vigor
     
-    The model shows how energy allocation (vigor) mediates the interaction between
-    pathogen defense and plant growth.
+    The model demonstrates the trade-off between growth and defense, mediated
+    through the plant's energy reserves (vigor). High pathogen loads can deplete
+    vigor, which then limits both defense and growth capabilities.
     """)
 
 if __name__ == "__main__":
