@@ -17,8 +17,8 @@ def run_simulation(params):
 
     def system(t, y):
         P, V, B = y
-        P = np.clip(P, 0, 1)
-        V = np.clip(V, 0, 1)
+        P = max(0, P)
+        V = max(0, V)
         B = np.clip(B, 0, 1)
         
         r = r0 * np.exp(-beta * V)
