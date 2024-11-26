@@ -23,7 +23,7 @@ def run_simulation(params):
         
         r = r0 * np.exp(-beta * V)
         dP_dt = (r - delta) * P * (1 - P)
-        dV_dt = eta * (1 - V) - gamma * g * B - alpha * P * V
+        dV_dt = eta * (1 - V) - gamma * g * B - alpha * P
         dB_dt = g * V * B * (1 - B)
         
         return [dP_dt, dV_dt, dB_dt]
@@ -97,11 +97,11 @@ def main():
     
     2. **Vigor Dynamics** (dV/dt):
         ```
-        dV/dt = η*(1-V) - γ*g*B - α*P*V
+        dV/dt = η*(1-V) - γ*g*B - α*P
         ```
         - Natural recovery rate η
         - Energy cost of growth γ*g*B
-        - Loss from pathogen damage α*P*V
+        - Loss from pathogen damage α*P
     
     3. **Biomass Growth** (dB/dt):
         ```
