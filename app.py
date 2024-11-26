@@ -132,7 +132,7 @@ def main():
                      help="Natural vigor recovery rate")
         gamma = st.slider("γ (growth cost)", 0.0, 0.2, 0.05, 0.01,
                        help="How much growth depletes vigor")
-        alpha = st.slider("α (pathogen impact)", 0.0, 0.3, 0.1, 0.01,
+        alpha = st.slider("α (pathogen impact)", 0.0, 0.5, 0.1, 0.01,
                        help="How much pathogens reduce vigor")
         V0 = st.slider("Initial Vigor", 0.0, 1.0, 0.75, 0.05,
                      help="Starting vigor level")
